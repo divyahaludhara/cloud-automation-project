@@ -1,0 +1,54 @@
+---
+- name: Deploy Custom Web App
+  hosts: web
+  become: yes
+
+  tasks:
+  - name: Update apt packages
+    apt:
+      update_cache: yes
+
+  - name: Install Docker
+    apt:
+      name: docker.io
+      state: present
+
+  - name: Start Docker service
+    service:
+      name: docker
+      state: started
+      enabled: yes
+
+  - name: Add ubuntu user to docker group
+    user:
+      name: ubuntu
+      groups: docker
+      append: yes
+
+  - name: Create app directory on server
+    file:
+      path: /home/divya/app
+      state: directory
+      owner: ubuntu
+      group: ubuntu
+
+  - name: Copy app files to server
+    copy:
+      src: ../app/
+      dest: /home/divya/app/
+      owner: ubuntu
+      group: ubuntu
+
+  - name: Build Docker image
+    command: docker build -t custom-webapp /home/divya/app
+
+  - name: Stop existing container if running
+    command: docker stop webapp
+    ignore_errors: yes
+
+  - name: Remove existing container if exists
+    command: docker rm webapp
+    ignore_errors: yes
+
+  - name: Run custom container
+    command: docker run -d --name webapp -p 80:80 --restart always custom-webapp

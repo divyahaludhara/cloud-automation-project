@@ -1,0 +1,20 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# SSH Keys
+Network
+Network.pub
+*.pem
+*.key
+
+# Ansible
+*.retry
+
+# Logs
+*.log
+
+# VS Code
+.vscode/
